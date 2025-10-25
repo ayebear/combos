@@ -619,9 +619,15 @@
                 mechanics2.forEach((c2, j) => {
                     const id = `cell-${i}-${j}`;
                     const cellId = `${i}-${j}`;
-                    const color = getCellColor(cellId);
-                    const comboStr = `${c1} + ${c2}`;
-                    table += `<td id="${id}" class="checkbox-cell" style="background-color: ${color};" onclick="toggleCellCheckbox(this)" data-combo="${comboStr}"><input type="checkbox" data-row="${i}" data-col="${j}" onchange="on2DCheckboxChange(this)" onclick="event.stopPropagation()"></td>`;
+                    const isDuplicate = c1.trim().toLowerCase() === c2.trim().toLowerCase();
+                    
+                    if (isDuplicate) {
+                        table += '<td class="disabled-cell"><input type="checkbox" disabled></td>';
+                    } else {
+                        const color = getCellColor(cellId);
+                        const comboStr = `${c1} + ${c2}`;
+                        table += `<td id="${id}" class="checkbox-cell" style="background-color: ${color};" onclick="toggleCellCheckbox(this)" data-combo="${comboStr}"><input type="checkbox" data-row="${i}" data-col="${j}" onchange="on2DCheckboxChange(this)" onclick="event.stopPropagation()"></td>`;
+                    }
                 });
                 table += '</tr>';
             });
@@ -656,7 +662,9 @@
             mechanics.forEach((c1, i) => {
                 table += `<tr><td class="row-header">${c1}</td>`;
                 mechanics.forEach((c2, j) => {
-                    if (i === j) {
+                    const isDuplicate = c1.trim().toLowerCase() === c2.trim().toLowerCase();
+                    
+                    if (isDuplicate) {
                         table += '<td class="disabled-cell"><input type="checkbox" disabled></td>';
                     } else {
                         const id = `cell-${i}-${j}`;
