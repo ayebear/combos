@@ -362,6 +362,26 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             display: none;
         }
+
+        .github-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .github-footer a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .github-footer a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -394,6 +414,10 @@
                 <button class="btn btn-success" onclick="importState()">Import</button>
             </div>
             <textarea id="statePreview" rows="6" placeholder="State JSON will appear here after export..."></textarea>
+        </div>
+
+        <div class="github-footer">
+            <a href="https://github.com/ayebear/combos" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
         </div>
     </div>
 
