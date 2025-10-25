@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Mechanic Combinations</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        h2 {
+            margin: 20px 0 10px 0;
+            color: #34495e;
+            font-size: 1.3em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .group {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .group-header h3 {
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.85em;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .mechanic-list {
+            list-style: none;
+        }
+
+        .mechanic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mechanic-item:last-child {
+            border-bottom: none;
+        }
+
+        .combo-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .group-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .group-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .group-checkbox:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .group-checkbox input[type="checkbox"]:checked~span,
+        .group-checkbox:has(input[type="checkbox"]:checked) {
+            border-color: #3498db;
+            background: #e3f2fd;
+            font-weight: 600;
+        }
+
+        .group-checkbox input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .combo-table {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+
+        td.row-header {
+            background: #ecf0f1;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        td input[type="checkbox"],
+        .table-nd-row input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        td input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        td.disabled-cell {
+            background: #95a5a6 !important;
+            cursor: not-allowed;
+        }
+
+        td.checkbox-cell,
+        .table-nd-row>div:first-child {
+            cursor: pointer;
+            text-align: center;
+            padding: 8px;
+            position: relative;
+        }
+
+        td.checkbox-cell:hover:not(:has(input[data-pair])) {
+            filter: brightness(0.85);
+        }
+
+        .table-nd-row>div:first-child:hover:not(:has(input:hover)) {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .table-nd-row:hover {
+            filter: brightness(0.9);
+        }
+
+        th.checkbox-header {
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+        }
+
+        th.checkbox-header:hover {
+            background: #2c3e50;
+        }
+
+        th.checkbox-header input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        td.linked {
+            background: #e8f4f8;
+        }
+
+        .table-nd {
+            margin-top: 15px;
+        }
+
+        .table-nd-row {
+            display: grid;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+            margin-bottom: 4px;
+            border-radius: 4px;
+        }
+
+        .table-nd-row.colored {
+            transition: background-color 0.2s;
+        }
+
+        .table-nd-header {
+            display: grid;
+            gap: 10px;
+            padding: 10px;
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .table-nd-header>div:first-child {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-nd-header input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        .combo-list {
+            list-style: none;
+        }
+
+        .combo-list li {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+            margin-bottom: 4px;
+            border-radius: 4px;
+        }
+
+
+        .export-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            resize: vertical;
+        }
+
+        .combo-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            pointer-events: none;
+            z-index: 10000;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Game Mechanic Combinations</h1>
+
+        <div class="section">
+            <h2>Groups ⇒ Mechanics</h2>
+            <div class="input-group">
+                <input type="text" id="newGroupName" placeholder="New group"
+                    onkeypress="if(event.key==='Enter') addGroup()">
+                <button class="btn btn-primary" onclick="addGroup()">Add Group</button>
+            </div>
+            <div class="groups" id="groupsContainer"></div>
+        </div>
+
+        <div class="section">
+            <h2>Combine Groups</h2>
+            <div class="combo-controls">
+                <div class="group-selector" id="groupSelector"></div>
+            </div>
+            <div class="results" id="results"></div>
+        </div>
+
+        <div class="section">
+            <h2>Export/Import</h2>
+            <div class="export-controls">
+                <button class="btn btn-primary" onclick="exportState()">Export to Clipboard</button>
+                <button class="btn btn-success" onclick="importState()">Import</button>
+            </div>
+            <textarea id="statePreview" rows="6" placeholder="State JSON will appear here after export..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            groups: {},
+            checkboxes: {}, // Store checkbox states by table type and coordinates
+            selectedGroups: [] // Store which groups are selected for combination generation
+        };
+
+        let currentTableType = null; // Track current table type for checkbox state management
+        let tooltip = null; // Tooltip element for showing combination strings
+
+        function refreshUI(shouldRegenerateTable = false) {
+            renderGroups();
+            renderGroupSelector();
+            saveState();
+            if (shouldRegenerateTable && state.selectedGroups.length > 0) {
+                generateCombinations();
+            } else if (shouldRegenerateTable && state.selectedGroups.length === 0) {
+                document.getElementById('results').innerHTML = '<p>Select at least one group</p>';
+            }
+        }
+
+        function addGroup() {
+            const input = document.getElementById('newGroupName');
+            const name = input.value.trim();
+            if (name && !state.groups[name]) {
+                state.groups[name] = [];
+                input.value = '';
+                refreshUI();
+            }
+        }
+
+        function deleteGroup(name) {
+            delete state.groups[name];
+            // Remove from selected groups if it was selected
+            state.selectedGroups = state.selectedGroups.filter(g => g !== name);
+            refreshUI(true);
+        }
+
+        function addMechanic(groupName) {
+            const safeId = groupName.replace(/[^a-zA-Z0-9]/g, '-');
+            const input = document.getElementById(`mechanic-input-${safeId}`);
+            const mechanic = input.value.trim();
+            if (mechanic && !state.groups[groupName].includes(mechanic)) {
+                state.groups[groupName].push(mechanic);
+                input.value = '';
+                const shouldRegenerate = state.selectedGroups.includes(groupName);
+                refreshUI(shouldRegenerate);
+                // Re-focus the input after render
+                setTimeout(() => {
+                    const newInput = document.getElementById(`mechanic-input-${safeId}`);
+                    if (newInput) newInput.focus();
+                }, 0);
+            }
+        }
+
+        function deleteMechanic(groupName, mechanic) {
+            state.groups[groupName] = state.groups[groupName].filter(c => c !== mechanic);
+            // If group becomes empty and is selected, deselect it
+            if (state.groups[groupName].length === 0 && state.selectedGroups.includes(groupName)) {
+                state.selectedGroups = state.selectedGroups.filter(g => g !== groupName);
+            }
+            refreshUI(true);
+        }
+
+        function renderGroups() {
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = '';
+
+            for (const [name, mechanics] of Object.entries(state.groups)) {
+                const group = document.createElement('div');
+                group.className = 'group';
+
+                const safeId = name.replace(/[^a-zA-Z0-9]/g, '-');
+
+                group.innerHTML = `
+                    <div class="group-header">
+                        <h3>${name}</h3>
+                        <button class="btn btn-danger btn-small" onclick="deleteGroup('${name}')">Delete</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="mechanic-input-${safeId}" placeholder="New mechanic" onkeypress="if(event.key==='Enter') addMechanic('${name}')">
+                        <button class="btn btn-primary btn-small" onclick="addMechanic('${name}')">Add</button>
+                    </div>
+                    <ul class="mechanic-list">
+                        ${mechanics.map(c => `
+                            <li class="mechanic-item">
+                                <span>${c}</span>
+                                <button class="btn btn-danger btn-small" onclick="deleteMechanic('${name}', '${c}')">×</button>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+
+                container.appendChild(group);
+            }
+        }
+
+        function renderGroupSelector() {
+            const selector = document.getElementById('groupSelector');
+            selector.innerHTML = '';
+
+            for (const name of Object.keys(state.groups)) {
+                const label = document.createElement('label');
+                label.className = 'group-checkbox';
+                const isEmpty = state.groups[name].length === 0;
+                const isChecked = state.selectedGroups.includes(name) ? 'checked' : '';
+                const isDisabled = isEmpty ? 'disabled' : '';
+                label.innerHTML = `
+                    <input type="checkbox" value="${name}" ${isChecked} ${isDisabled} onchange="onGroupSelectorChange(this)">
+                    <span>${name}${isEmpty ? ' (empty)' : ''}</span>
+                `;
+                if (isEmpty) {
+                    label.style.opacity = '0.5';
+                    label.style.cursor = 'not-allowed';
+                }
+                selector.appendChild(label);
+            }
+        }
+
+        function onGroupSelectorChange(checkbox) {
+            const groupName = checkbox.value;
+            if (checkbox.checked) {
+                if (!state.selectedGroups.includes(groupName)) {
+                    state.selectedGroups.push(groupName);
+                }
+            } else {
+                state.selectedGroups = state.selectedGroups.filter(c => c !== groupName);
+            }
+            saveState();
+            generateCombinations();
+        }
+
+        function getCombinations(arr, k) {
+            if (k === 1) return arr.map(x => [x]);
+            if (k === arr.length) return [arr];
+
+            const result = [];
+            for (let i = 0; i <= arr.length - k; i++) {
+                const head = arr[i];
+                const tailCombs = getCombinations(arr.slice(i + 1), k - 1);
+                for (const tail of tailCombs) {
+                    result.push([head, ...tail]);
+                }
+            }
+            return result;
+        }
+
+        function generateCombinations() {
+            const checkboxes = document.querySelectorAll('#groupSelector input[type="checkbox"]:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selected.length === 0) {
+                document.getElementById('results').innerHTML = '<p>Select at least one group</p>';
+                return;
+            }
+
+            if (selected.length === 1) {
+                // Single group - self combinations
+                const mechanics = state.groups[selected[0]];
+                if (mechanics.length < 2) {
+                    document.getElementById('results').innerHTML = '<p>Need at least 2 mechanics for combinations</p>';
+                    return;
+                }
+                renderTable2DSelf(mechanics);
+            } else if (selected.length === 2) {
+                // Two groups - standard 2D table
+                const mechanics1 = state.groups[selected[0]];
+                const mechanics2 = state.groups[selected[1]];
+                if (mechanics1.length === 0 || mechanics2.length === 0) {
+                    document.getElementById('results').innerHTML = '<p>Groups need at least 1 mechanic each</p>';
+                    return;
+                }
+                renderTable2DCustom(mechanics1, mechanics2);
+            } else {
+                // 3+ groups - one mechanic from each group
+                const hasEnoughMechanics = selected.every(cat => state.groups[cat].length > 0);
+                if (!hasEnoughMechanics) {
+                    document.getElementById('results').innerHTML = '<p>All selected groups need at least 1 mechanic</p>';
+                    return;
+                }
+
+                const combos = generateCrossProduct(selected);
+                renderNDTable(combos, selected);
+            }
+        }
+
+        function generateCrossProduct(groups) {
+            // Generate all combinations with exactly one mechanic from each group
+            if (groups.length === 0) return [[]];
+
+            const [first, ...rest] = groups;
+            const firstMechanics = state.groups[first];
+            const restCombos = generateCrossProduct(rest);
+
+            const result = [];
+            for (const mechanic of firstMechanics) {
+                for (const combo of restCombos) {
+                    result.push([mechanic, ...combo]);
+                }
+            }
+            return result;
+        }
+
+        function renderTable2DCustom(mechanics1, mechanics2) {
+            const checkboxes = document.querySelectorAll('#groupSelector input[type="checkbox"]:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            currentTableType = `2d-custom-${selected.join('-')}`;
+            cellColorMap = {}; // Reset color map for new table
+            colorIndex = 0;
+
+            const results = document.getElementById('results');
+            let table = '<div class="combo-table"><table>';
+
+            table += '<tr><th class="checkbox-header" onclick="toggleAllCheckboxes()"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes()"></th>';
+            mechanics2.forEach(c => table += `<th>${c} (${selected[1]})</th>`);
+            table += '</tr>';
+
+            mechanics1.forEach((c1, i) => {
+                table += `<tr><td class="row-header">${c1} (${selected[0]})</td>`;
+                mechanics2.forEach((c2, j) => {
+                    const id = `cell-${i}-${j}`;
+                    const cellId = `${i}-${j}`;
+                    const color = getCellColor(cellId);
+                    const comboStr = `${c1} + ${c2}`;
+                    table += `<td id="${id}" class="checkbox-cell" style="background-color: ${color};" onclick="toggleCellCheckbox(this)" data-combo="${comboStr}"><input type="checkbox" data-row="${i}" data-col="${j}" onchange="on2DCheckboxChange(this)" onclick="event.stopPropagation()"></td>`;
+                });
+                table += '</tr>';
+            });
+
+            table += '</table></div>';
+            results.innerHTML = table;
+
+            // Load checkbox states
+            setTimeout(() => {
+                document.querySelectorAll('#results input[type="checkbox"]:not(#selectAllCheckbox)').forEach(cb => {
+                    loadCheckboxState(cb, currentTableType);
+                });
+                updateSelectAllState();
+                attachTooltipListeners();
+            }, 0);
+        }
+
+        function renderTable2DSelf(mechanics) {
+            const checkboxes = document.querySelectorAll('#groupSelector input[type="checkbox"]:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            currentTableType = `2d-self-${selected.join('-')}`;
+            pairColorMap = {}; // Reset color map for new table
+            colorIndex = 0;
+
+            const results = document.getElementById('results');
+            let table = '<div class="combo-table"><table>';
+
+            table += '<tr><th class="checkbox-header" onclick="toggleAllCheckboxes()"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes()"></th>';
+            mechanics.forEach(c => table += `<th>${c} (${selected[0]})</th>`);
+            table += '</tr>';
+
+            mechanics.forEach((c1, i) => {
+                table += `<tr><td class="row-header">${c1} (${selected[0]})</td>`;
+                mechanics.forEach((c2, j) => {
+                    if (i === j) {
+                        table += '<td class="disabled-cell"><input type="checkbox" disabled></td>';
+                    } else {
+                        const id = `cell-${i}-${j}`;
+                        const linkedId = `cell-${j}-${i}`;
+                        const pairId = i < j ? `${i}-${j}` : `${j}-${i}`;
+                        // Always show in canonical order (A + B, not B + A)
+                        const comboStr = i < j ? `${c1} + ${c2}` : `${c2} + ${c1}`;
+                        table += `<td id="${id}" class="checkbox-cell" onclick="toggleCellCheckbox(this)" onmouseenter="highlightLinkedCell(this)" onmouseleave="unhighlightLinkedCell(this)" data-combo="${comboStr}"><input type="checkbox" data-row="${i}" data-col="${j}" data-linked="${linkedId}" data-pair="${pairId}" onchange="syncLinked(this)" onclick="event.stopPropagation()"></td>`;
+                    }
+                });
+                table += '</tr>';
+            });
+
+            table += '</table></div>';
+            results.innerHTML = table;
+
+            // Load checkbox states and apply colors
+            setTimeout(() => {
+                document.querySelectorAll('#results input[type="checkbox"]:not(#selectAllCheckbox)').forEach(cb => {
+                    loadCheckboxState(cb, currentTableType);
+                });
+                applyPairColors();
+                updateSelectAllState();
+                attachTooltipListeners();
+            }, 0);
+        }
+
+        const colorPalette = [
+            '#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFD9BA',
+            '#E0BBE4', '#FFDFD3', '#C7CEEA', '#B4F8C8', '#FBE7C6'
+        ];
+
+        const hoverColorPalette = [
+            '#FF8A94', '#8AFFAA', '#8AC8FF', '#FFFF8A', '#FFBA8A',
+            '#C78BC8', '#FFBFA3', '#A3ADCE', '#8AE0A8', '#F5D1A6'
+        ];
+
+        let pairColorMap = {};
+        let cellColorMap = {};
+        let colorIndex = 0;
+
+        function getCellColor(cellId) {
+            if (!cellColorMap[cellId]) {
+                cellColorMap[cellId] = colorPalette[colorIndex % colorPalette.length];
+                colorIndex++;
+            }
+            return cellColorMap[cellId];
+        }
+
+        function getPairColor(pairId) {
+            if (!pairColorMap[pairId]) {
+                pairColorMap[pairId] = {
+                    normal: colorPalette[colorIndex % colorPalette.length],
+                    hover: hoverColorPalette[colorIndex % hoverColorPalette.length]
+                };
+                colorIndex++;
+            }
+            return pairColorMap[pairId];
+        }
+
+        function highlightLinked(checkbox) {
+            const linkedId = checkbox.dataset.linked;
+            const linkedCell = document.getElementById(linkedId);
+            const pairId = checkbox.dataset.pair;
+
+            if (linkedCell && pairId) {
+                const colors = getPairColor(pairId);
+                linkedCell.style.backgroundColor = colors.hover;
+                checkbox.parentElement.style.backgroundColor = colors.hover;
+            }
+        }
+
+        function unhighlightLinked(checkbox) {
+            const linkedId = checkbox.dataset.linked;
+            const linkedCell = document.getElementById(linkedId);
+            const pairId = checkbox.dataset.pair;
+
+            if (linkedCell && pairId) {
+                const colors = getPairColor(pairId);
+                linkedCell.style.backgroundColor = colors.normal;
+                checkbox.parentElement.style.backgroundColor = colors.normal;
+            }
+        }
+
+        function highlightLinkedCell(cell) {
+            const checkbox = cell.querySelector('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            const linkedId = checkbox.dataset.linked;
+            const linkedCell = document.getElementById(linkedId);
+            const pairId = checkbox.dataset.pair;
+
+            if (linkedCell && pairId) {
+                const colors = getPairColor(pairId);
+                linkedCell.style.backgroundColor = colors.hover;
+                cell.style.backgroundColor = colors.hover;
+            }
+        }
+
+        function unhighlightLinkedCell(cell) {
+            const checkbox = cell.querySelector('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            const linkedId = checkbox.dataset.linked;
+            const linkedCell = document.getElementById(linkedId);
+            const pairId = checkbox.dataset.pair;
+
+            if (linkedCell && pairId) {
+                const colors = getPairColor(pairId);
+                linkedCell.style.backgroundColor = colors.normal;
+                cell.style.backgroundColor = colors.normal;
+            }
+        }
+
+        function syncLinked(checkbox) {
+            const linkedId = checkbox.dataset.linked;
+            const linkedCell = document.getElementById(linkedId);
+            if (linkedCell) {
+                const linkedCheckbox = linkedCell.querySelector('input[type="checkbox"]');
+                if (linkedCheckbox) {
+                    linkedCheckbox.checked = checkbox.checked;
+                }
+            }
+            saveCheckboxState(checkbox);
+            updateSelectAllState();
+        }
+
+        function on2DCheckboxChange(checkbox) {
+            saveCheckboxState(checkbox);
+            updateSelectAllState();
+        }
+
+        function toggleCellCheckbox(cell) {
+            const checkbox = cell.querySelector('input[type="checkbox"]');
+            if (checkbox && !checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function saveCheckboxState(checkbox) {
+            if (!currentTableType) return;
+
+            const row = checkbox.dataset.row;
+            const col = checkbox.dataset.col;
+            const key = `${currentTableType}-${row}-${col}`;
+
+            if (!state.checkboxes[currentTableType]) {
+                state.checkboxes[currentTableType] = {};
+            }
+
+            state.checkboxes[currentTableType][`${row}-${col}`] = checkbox.checked;
+            saveState();
+        }
+
+        function loadCheckboxState(checkbox, tableType) {
+            const row = checkbox.dataset.row;
+            const col = checkbox.dataset.col;
+
+            if (state.checkboxes[tableType] && state.checkboxes[tableType][`${row}-${col}`] !== undefined) {
+                checkbox.checked = state.checkboxes[tableType][`${row}-${col}`];
+            }
+        }
+
+        function applyPairColors() {
+            // Apply persistent colors to all cells with pair IDs
+            const cells = document.querySelectorAll('td[id^="cell-"]');
+            cells.forEach(cell => {
+                const checkbox = cell.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.dataset.pair) {
+                    const colors = getPairColor(checkbox.dataset.pair);
+                    cell.style.backgroundColor = colors.normal;
+                }
+            });
+        }
+
+        function toggleAllCheckboxes() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allCheckboxes = document.querySelectorAll('#results input[type="checkbox"]:not(:disabled):not(#selectAllCheckbox)');
+            if (allCheckboxes.length === 0) return;
+
+            // If called from the checkbox itself, use its checked state
+            // Otherwise, determine state based on current selection
+            let newState;
+            if (selectAllCheckbox && event && event.target === selectAllCheckbox) {
+                newState = selectAllCheckbox.checked;
+            } else {
+                const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+                newState = checkedCount < allCheckboxes.length;
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = newState;
+                }
+            }
+
+            allCheckboxes.forEach(cb => {
+                if (cb.checked !== newState) {
+                    cb.checked = newState;
+                    cb.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        function updateSelectAllState() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const ndHeader = document.querySelector('.table-nd-header > div:first-child');
+
+            const allCheckboxes = document.querySelectorAll('#results input[type="checkbox"]:not(:disabled):not(#selectAllCheckbox)');
+            if (allCheckboxes.length === 0) return;
+
+            const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+
+            if (selectAllCheckbox) {
+                // For 2D tables with real checkbox
+                if (checkedCount === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedCount === allCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
+            } else if (ndHeader) {
+                // For ND tables with text indicator
+                if (checkedCount === 0) {
+                    ndHeader.textContent = '☐';
+                } else if (checkedCount === allCheckboxes.length) {
+                    ndHeader.textContent = '☑';
+                } else {
+                    ndHeader.textContent = '◫';
+                }
+            }
+        }
+
+        function saveNDCheckboxState(checkbox) {
+            if (!currentTableType) return;
+
+            const row = checkbox.dataset.row;
+
+            if (!state.checkboxes[currentTableType]) {
+                state.checkboxes[currentTableType] = {};
+            }
+
+            state.checkboxes[currentTableType][row] = checkbox.checked;
+            saveState();
+            updateNDSelectAllState();
+        }
+
+        function loadNDCheckboxState(checkbox, tableType) {
+            const row = checkbox.dataset.row;
+
+            if (state.checkboxes[tableType] && state.checkboxes[tableType][row] !== undefined) {
+                checkbox.checked = state.checkboxes[tableType][row];
+            }
+        }
+
+        function renderNDTable(combos, groupNames) {
+            const checkboxes = document.querySelectorAll('#groupSelector input[type="checkbox"]:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            currentTableType = `nd-${selected.join('-')}`;
+
+            const results = document.getElementById('results');
+            const numCols = groupNames.length + 1; // +1 for checkbox column
+
+            let html = '<div class="table-nd">';
+            html += `<div class="table-nd-header" style="grid-template-columns: 40px repeat(${groupNames.length}, 1fr);">`;
+            html += '<div style="cursor: pointer;" onclick="toggleAllNDCheckboxes()"><input type="checkbox" id="selectAllNDCheckbox" onchange="toggleAllNDCheckboxes()" onclick="event.stopPropagation()"></div>'; // Checkbox column header
+            groupNames.forEach(catName => {
+                html += `<div>${catName}</div>`;
+            });
+            html += '</div>';
+
+            combos.forEach((combo, idx) => {
+                const color = colorPalette[idx % colorPalette.length];
+                const comboStr = combo.join(' + ');
+                html += `<div class="table-nd-row colored" style="grid-template-columns: 40px repeat(${groupNames.length}, 1fr); background-color: ${color};" onclick="toggleNDRowCheckbox(event, this)" data-combo="${comboStr}">`;
+                html += `<div><input type="checkbox" data-row="${idx}" onchange="saveNDCheckboxState(this)" onclick="event.stopPropagation()"></div>`;
+                combo.forEach(item => {
+                    html += `<div>${item}</div>`;
+                });
+                html += '</div>';
+            });
+
+            html += '</div>';
+            results.innerHTML = html;
+
+            // Load checkbox states
+            setTimeout(() => {
+                document.querySelectorAll('.table-nd-row input[type="checkbox"]').forEach(cb => {
+                    loadNDCheckboxState(cb, currentTableType);
+                });
+                updateNDSelectAllState();
+                attachTooltipListeners();
+            }, 0);
+        }
+
+        function toggleNDRowCheckbox(event, row) {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function toggleAllNDCheckboxes() {
+            const selectAllCheckbox = document.getElementById('selectAllNDCheckbox');
+            const allCheckboxes = document.querySelectorAll('.table-nd-row input[type="checkbox"]');
+            if (allCheckboxes.length === 0) return;
+
+            // If called from the checkbox itself, use its checked state
+            let newState;
+            if (selectAllCheckbox && event && event.target === selectAllCheckbox) {
+                newState = selectAllCheckbox.checked;
+            } else {
+                const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+                newState = checkedCount < allCheckboxes.length;
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = newState;
+                }
+            }
+
+            allCheckboxes.forEach(cb => {
+                if (cb.checked !== newState) {
+                    cb.checked = newState;
+                    cb.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        function updateNDSelectAllState() {
+            const selectAllCheckbox = document.getElementById('selectAllNDCheckbox');
+            if (!selectAllCheckbox) return;
+
+            const allCheckboxes = document.querySelectorAll('.table-nd-row input[type="checkbox"]');
+            if (allCheckboxes.length === 0) return;
+
+            const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+
+            if (checkedCount === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCount === allCheckboxes.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        function exportState() {
+            const json = JSON.stringify(state, null, 2);
+            document.getElementById('statePreview').value = json;
+            navigator.clipboard.writeText(json);
+        }
+
+        function importState() {
+            const text = document.getElementById('statePreview').value;
+            if (!text.trim()) {
+                alert('Please paste JSON data into the text area first');
+                return;
+            }
+            try {
+                const imported = JSON.parse(text);
+                if (imported.groups) {
+                    state = imported;
+                    renderGroups();
+                    renderGroupSelector();
+                    saveState();
+                } else {
+                    alert('Invalid state format');
+                }
+            } catch (e) {
+                alert('Failed to parse JSON: ' + e.message);
+            }
+        }
+
+        function saveState() {
+            const json = JSON.stringify(state);
+            localStorage.setItem('comboManagerState', json);
+            document.getElementById('statePreview').value = JSON.stringify(state, null, 2);
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('comboManagerState');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.groups) {
+                        state = parsed;
+                        // Ensure checkboxes object exists
+                        if (!state.checkboxes) {
+                            state.checkboxes = {};
+                        }
+                        // Ensure selectedGroups array exists
+                        if (!state.selectedGroups) {
+                            state.selectedGroups = [];
+                        }
+                        document.getElementById('statePreview').value = JSON.stringify(state, null, 2);
+                    }
+                } catch (e) {
+                    console.error('Failed to load state from localStorage:', e);
+                }
+            }
+        }
+
+        function createTooltip() {
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'combo-tooltip';
+                document.body.appendChild(tooltip);
+            }
+        }
+
+        function showTooltip(event, text) {
+            createTooltip();
+            tooltip.textContent = text;
+            tooltip.style.display = 'block';
+            updateTooltipPosition(event);
+        }
+
+        function hideTooltip() {
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+
+        function updateTooltipPosition(event) {
+            if (tooltip && tooltip.style.display === 'block') {
+                const offset = 15;
+                tooltip.style.left = (event.clientX + offset) + 'px';
+                tooltip.style.top = (event.clientY + offset) + 'px';
+            }
+        }
+
+        function attachTooltipListeners() {
+            // Attach to 2D table cells
+            document.querySelectorAll('td.checkbox-cell[data-combo]').forEach(cell => {
+                cell.addEventListener('mouseenter', (e) => {
+                    const comboText = cell.getAttribute('data-combo');
+                    if (comboText) {
+                        showTooltip(e, comboText);
+                    }
+                });
+                cell.addEventListener('mousemove', updateTooltipPosition);
+                cell.addEventListener('mouseleave', hideTooltip);
+            });
+
+            // Attach to ND table rows
+            document.querySelectorAll('.table-nd-row[data-combo]').forEach(row => {
+                row.addEventListener('mouseenter', (e) => {
+                    const comboText = row.getAttribute('data-combo');
+                    if (comboText) {
+                        showTooltip(e, comboText);
+                    }
+                });
+                row.addEventListener('mousemove', updateTooltipPosition);
+                row.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        // Initialize
+        loadState();
+        renderGroups();
+        renderGroupSelector();
+        // Auto-generate combinations if groups were previously selected
+        if (state.selectedGroups.length > 0) {
+            generateCombinations();
+        }
+    </script>
+</body>
+
+</html>
