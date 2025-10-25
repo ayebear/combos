@@ -650,11 +650,11 @@
             let table = '<div class="combo-table"><table>';
 
             table += '<tr><th class="checkbox-header" onclick="toggleAllCheckboxes()"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes()"></th>';
-            mechanics.forEach(c => table += `<th>${c} (${selected[0]})</th>`);
+            mechanics.forEach(c => table += `<th>${c}</th>`);
             table += '</tr>';
 
             mechanics.forEach((c1, i) => {
-                table += `<tr><td class="row-header">${c1} (${selected[0]})</td>`;
+                table += `<tr><td class="row-header">${c1}</td>`;
                 mechanics.forEach((c2, j) => {
                     if (i === j) {
                         table += '<td class="disabled-cell"><input type="checkbox" disabled></td>';
