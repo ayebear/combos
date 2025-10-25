@@ -922,6 +922,13 @@
             const results = document.getElementById('results');
             const numCols = groupNames.length + 1; // +1 for checkbox column
 
+            // Filter out combos with duplicate items (case-insensitive, trimmed)
+            const filteredCombos = combos.filter(combo => {
+                const normalized = combo.map(item => item.trim().toLowerCase());
+                const uniqueSet = new Set(normalized);
+                return uniqueSet.size === normalized.length;
+            });
+
             let html = '<div class="table-nd">';
             html += `<div class="table-nd-header" style="grid-template-columns: 40px repeat(${groupNames.length}, 1fr);">`;
             html += '<div style="cursor: pointer;" onclick="toggleAllNDCheckboxes()"><input type="checkbox" id="selectAllNDCheckbox" onchange="toggleAllNDCheckboxes()" onclick="event.stopPropagation()"></div>'; // Checkbox column header
@@ -930,7 +937,7 @@
             });
             html += '</div>';
 
-            combos.forEach((combo, idx) => {
+            filteredCombos.forEach((combo, idx) => {
                 const color = colorPalette[idx % colorPalette.length];
                 const comboStr = combo.join(' + ');
                 html += `<div class="table-nd-row colored" style="grid-template-columns: 40px repeat(${groupNames.length}, 1fr); background-color: ${color};" onclick="toggleNDRowCheckbox(event, this)" data-combo="${comboStr}">`;
